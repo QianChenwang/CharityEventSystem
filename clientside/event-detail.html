@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Details - CharityHub</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">CharityHub</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="search.html">Search Events</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="error-message" id="detailError"></div>
+
+    <!-- 事件头部大图 -->
+    <div class="event-hero">
+      <img src="" alt="Event" id="eventHeroImg" onerror="this.src='https://via.placeholder.com/1200x400?text=Event+Image'; this.style.objectFit='cover';">
+      <div class="event-hero-content">
+        <span class="category" id="eventCategoryHero"></span>
+        <h1 id="eventTitleHero"></h1>
+        <div class="event-meta" id="eventMetaHero"></div>
+      </div>
+    </div>
+
+    <!-- 事件详情内容 -->
+    <div class="event-detail-content">
+      <div class="event-description card">
+        <h2>About This Event</h2>
+        <p id="eventDescription" class="loading">Loading...</p>
+        
+        <h2>Purpose</h2>
+        <p id="eventPurpose" class="loading">Loading...</p>
+
+        <!-- 天气信息（可选） -->
+        <h2>Event Weather</h2>
+        <div id="eventWeather" class="loading">Loading weather...</div>
+
+        <!-- A3核心：注册列表 -->
+        <h2>Current Registrations</h2>
+        <div id="registrationsList" class="loading">Loading registrations...</div>
+
+        <h2>Host Organization</h2>
+        <p id="orgMission" class="loading">Loading...</p>
+        <p><strong>Contact:</strong> <span id="orgContact" class="loading">Loading...</span></p>
+      </div>
+
+      <div class="event-sidebar">
+        <!-- 筹款进度 -->
+        <div class="progress-section card">
+          <h3>Fundraiser Progress</h3>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-text">
+            <span id="currentAmount">Loading...</span> / 
+            <span id="goalAmount">Loading...</span>
+          </div>
+          <div class="progress-percent" id="progressPercent">Loading...</div>
+        </div>
+
+        <!-- 注册按钮 -->
+        <div class="sidebar-card card">
+          <h3>Register Now</h3>
+          <p id="ticketPrice" class="loading">Loading...</p>
+          <a href="" id="registerLink" class="register-btn">
+            <i class="fa-solid fa-user-plus"></i> Register
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/event-detail.js"></script>
+</body>
+</html>
