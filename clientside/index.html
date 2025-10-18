@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charity Events Hub - Home</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- 导航栏（作业要求：所有页面统一） -->
+  <nav>
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">CharityHub</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="search.html">Search Events</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- 主要内容 -->
+  <div class="container">
+    <h1 class="page-title">Make a Difference Together</h1>
+
+    <!-- 首页欢迎语（作业要求：静态内容-欢迎信息） -->
+    <section class="welcome-message card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <h2><i class="fa-solid fa-hand-holding-heart"></i> Welcome to CharityHub</h2>
+      <p>Your gateway to supporting local charity events—join us in making our community stronger, one event at a time.</p>
+    </section>
+
+    <!-- 静态机构信息（作业要求：使命、联系方式） -->
+    <section class="org-info card">
+      <h2>Community Care Foundation</h2>
+      <p><strong>Mission:</strong> Our mission is to support vulnerable families in the local community through food banks, education grants, and medical assistance. We believe every individual deserves access to basic needs and opportunities to thrive.</p>
+      <p><strong>Contact Email:</strong> contact@ccfoundation.org</p>
+      <p><strong>Contact Phone:</strong> +61 2 1234 5678</p>
+      <p><strong>Address:</strong> 123 Charity Street, Sydney NSW 2000</p>
+    </section>
+
+    <!-- 动态 upcoming 事件列表（作业要求：标记为Upcoming，排除past/suspended） -->
+    <section>
+      <h2 class="section-title">Upcoming Charity Events</h2>
+      <div class="error-message" id="homeError">Failed to load events. Please check if the API server is running.</div>
+      <div class="events-grid" id="upcomingEvents">
+        <div class="loading">Loading upcoming events...</div>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/home.js"></script>
+</body>
+</html>
