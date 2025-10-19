@@ -1,10 +1,8 @@
-// 注意：部署时替换为cPanel的API地址（如 'https://你的域名.com/api'）
+// 统一API地址（无需修改，已正确）
 const API_BASE_URL = 'http://localhost:3000/api';
-
 document.addEventListener('DOMContentLoaded', () => {
   const errorEl = document.getElementById('detailError');
   errorEl.style.display = 'none';
-
   // 获取URL中的事件ID
   const urlParams = new URLSearchParams(window.location.search);
   const eventId = urlParams.get('id');
@@ -13,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showError('No event selected. Please return to the home page.');
     return;
   }
-
   // 加载事件详情和注册列表
   loadEventDetails(eventId);
   // 加载天气信息（可选）
@@ -29,17 +26,16 @@ async function loadEventDetails(eventId) {
       const error = await response.json();
       throw new Error(error.error || 'Event not found');
     }
-
     const event = await response.json();
 
-    // 渲染事件基础信息
+    // 渲染事件基础信息（修复：组织名称显示event.organization_name，原代码错用event.name）
     document.getElementById('eventHeroImg').src = `images/event-${event.id}.jpg`;
     document.getElementById('eventCategoryHero').textContent = event.category_name;
     document.getElementById('eventTitleHero').textContent = event.name;
     document.getElementById('eventMetaHero').innerHTML = `
       <span><i class="fa-regular fa-calendar"></i> ${formatDate(event.date)}</span>
       <span><i class="fa-solid fa-location-dot"></i> ${event.location}</span>
-      <span><i class="fa-solid fa-building"></i> ${event.name}</span>
+      <span><i class="fa-solid fa-building"></i> ${event.organization_name}</span> <!-- 修复：显示组织名称 -->
     `;
     document.getElementById('eventDescription').textContent = event.description;
     document.getElementById('eventPurpose').textContent = event.purpose;
@@ -49,26 +45,25 @@ async function loadEventDetails(eventId) {
       ? 'Free Entry' 
       : `$${Number(event.ticket_price).toFixed(2)} per ticket`;
 
-    // 渲染筹款进度
+    // 渲染筹款进度（不变）
     const progress = Math.min(Math.round((event.current_amount / event.goal_amount) * 100), 100);
     document.getElementById('currentAmount').textContent = `$${Number(event.current_amount).toFixed(2)}`;
     document.getElementById('goalAmount').textContent = `$${Number(event.goal_amount).toFixed(2)}`;
     document.getElementById('progressPercent').textContent = `${progress}% Complete`;
     document.getElementById('progressFill').style.width = `${progress}%`;
 
-    // 渲染注册列表
+    // 渲染注册列表（不变）
     renderRegistrations(event.registrations);
 
-    // 设置注册链接
+    // 设置注册链接（不变）
     document.getElementById('registerLink').href = `registration.html?id=${eventId}`;
-
   } catch (err) {
     showError(err.message);
     console.error('加载事件失败：', err);
   }
 }
 
-// 渲染注册列表
+// 渲染注册列表（不变）
 function renderRegistrations(registrations) {
   const container = document.getElementById('registrationsList');
   
@@ -76,7 +71,6 @@ function renderRegistrations(registrations) {
     container.textContent = 'No registrations yet. Be the first to register!';
     return;
   }
-
   let html = `
     <table class="registrations-table">
       <thead>
@@ -89,7 +83,6 @@ function renderRegistrations(registrations) {
       </thead>
       <tbody>
   `;
-
   registrations.forEach(reg => {
     html += `
       <tr>
@@ -100,17 +93,15 @@ function renderRegistrations(registrations) {
       </tr>
     `;
   });
-
   html += `</tbody></table>`;
   container.innerHTML = html;
 }
 
-// 加载天气信息（可选）
+// 加载天气信息（可选，不变）
 async function loadWeather(eventId) {
   try {
     const response = await fetch(`${API_BASE_URL}/events/${eventId}/weather`);
     if (!response.ok) throw new Error('Weather data unavailable');
-
     const weather = await response.json();
     document.getElementById('eventWeather').innerHTML = `
       <p><i class="fa-solid fa-cloud"></i> ${weather.weather}</p>
@@ -122,19 +113,19 @@ async function loadWeather(eventId) {
   }
 }
 
-// 工具函数：格式化日期
+// 工具函数：格式化日期（不变）
 function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString('en-AU', {
     year: 'numeric', month: 'long', day: 'numeric'
   });
 }
 
-// 工具函数：格式化日期时间
+// 工具函数：格式化日期时间（不变）
 function formatDateTime(dateString) {
   return new Date(dateString).toLocaleString('en-AU');
 }
 
-// 显示错误信息
+// 显示错误信息（不变）
 function showError(message) {
   const errorEl = document.getElementById('detailError');
   errorEl.textContent = message;
