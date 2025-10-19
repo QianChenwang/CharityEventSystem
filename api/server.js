@@ -1,30 +1,34 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const clientRoutes = require('./routes/client');
+const pool = require('./config/event_db'); // 数据库连接
+const clientRoutes = require('./routes/client'); // 客户端路由
+const adminRoutes = require('./routes/admin'); // 管理员路由（修正：确保已导入）
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 中间件（解决跨域和数据解析问题）
+// 中间件：允许跨域请求（开发环境用）
 app.use(cors());
+// 中间件：解析JSON请求体
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// 路由挂载（客户端API）
-app.use('/api', clientRoutes);
 
 // 根路径测试
 app.get('/', (req, res) => {
-  res.json({ message: 'Charity Event API (A3) is running' });
+  res.json({ message: 'Charity Event API is running. Use /api for client endpoints, /api/admin for admin endpoints.' });
 });
 
-// 启动服务
-const server = app.listen(PORT, () => {
-  console.log(`API运行在 http://localhost:${PORT}`);
-  console.log('客户端接口：/api/events/:id (详情+注册列表) | /api/registrations (注册)');
-}).on('error', (err) => {
-  console.error('服务启动失败：', err);
+// 挂载路由（修正：明确区分客户端和管理员路由）
+app.use('/api', clientRoutes); // 客户端接口：/api/...
+app.use('/api/admin', adminRoutes); // 管理员接口：/api/admin/...
+
+// 启动服务器
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
-module.exports = server;
+// 处理未捕获的异常
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  // 关闭数据库连接后退出
+  pool.end().then(() => process.exit(1));
+});
