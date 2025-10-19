@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Charity Events</title>
+    <!-- 调整CSS路径：从clientside/css/style.css加载 -->
+    <link rel="stylesheet" href="../clientside/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 导航菜单：调整客户端首页链接 -->
+    <nav class="admin-nav">
+        <div class="nav-container">
+            <a href="admin-dashboard.html" class="nav-link active">Event List</a>
+            <a href="admin-add.html" class="nav-link">Add New Event</a>
+            <a href="../clientside/index.html" class="nav-link">Client Site</a> <!-- 新路径 -->
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Admin Dashboard: All Events</h1>
+        <p>Manage all charity events (including suspended ones). Click "Edit" to update details or "Delete" to remove.</p>
+
+        <div id="eventsContainer" class="events-grid">
+            <div class="loading">Loading events...</div>
+        </div>
+        <div id="adminError" class="error-message"></div>
+    </div>
+
+    <!-- 调整JS路径：当前目录下的js文件夹 -->
+    <script src="js/admin-events.js"></script>
+    <style>
+        /* 导航和按钮样式（不变） */
+        .admin-nav {
+            background: #2c3e50;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+            padding: 0 1rem;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active {
+            border-bottom: 2px solid #3498db;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .edit-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</body>
+</html>
