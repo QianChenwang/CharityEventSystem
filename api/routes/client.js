@@ -1,8 +1,9 @@
+const fetch = require('node-fetch');
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/event_db');
 
-// 1. 获取事件详情+注册列表（A3核心改进）
+// 1. 获取单个事件详情+注册列表
 router.get('/events/:id', async (req, res) => {
   try {
     const eventId = req.params.id;
@@ -22,7 +23,6 @@ router.get('/events/:id', async (req, res) => {
       return res.status(404).json({ error: 'Event not found or suspended' });
     }
 
-    // 整合数据（避免重复字段）
     const event = { ...results[0] };
     event.registrations = results
       .filter(item => item.registration_id)
@@ -35,7 +35,6 @@ router.get('/events/:id', async (req, res) => {
         registration_date: item.registration_date
       }));
 
-    // 删除冗余字段
     ['registration_id', 'full_name', 'email', 'phone', 'ticket_quantity', 'registration_date'].forEach(key => {
       delete event[key];
     });
@@ -47,12 +46,30 @@ router.get('/events/:id', async (req, res) => {
   }
 });
 
-// 2. 用户注册事件（A3新增）
+// 2. 获取所有未暂停的事件
+router.get('/events', async (req, res) => {
+  try {
+    const [events] = await pool.query(`
+      SELECT e.*, c.name AS category_name, o.name AS organization_name
+      FROM events e
+      INNER JOIN categories c ON e.category_id = c.id
+      INNER JOIN organizations o ON e.organization_id = o.id
+      WHERE e.is_suspended = FALSE
+      ORDER BY e.date DESC
+    `);
+
+    res.json(events);
+  } catch (err) {
+    console.error('获取所有事件API错误：', err);
+    res.status(500).json({ error: 'Failed to load events' });
+  }
+});
+
+// 3. 用户注册事件
 router.post('/registrations', async (req, res) => {
   try {
     const { event_id, full_name, email, phone, ticket_quantity } = req.body;
 
-    // 基础验证
     if (!event_id || !full_name || !email || !phone || !ticket_quantity) {
       return res.status(400).json({ error: 'All fields are required' });
     }
@@ -63,7 +80,16 @@ router.post('/registrations', async (req, res) => {
       return res.status(400).json({ error: 'Invalid email format' });
     }
 
-    // 检查重复注册
+    const [event] = await pool.query(
+      'SELECT ticket_price FROM events WHERE id = ? AND is_suspended = FALSE',
+      [event_id]
+    );
+    if (event.length === 0) {
+      return res.status(404).json({ error: 'Event not found or suspended' });
+    }
+
+    const total_amount = event[0].ticket_price * ticket_quantity;
+
     const [existing] = await pool.query(
       'SELECT * FROM registrations WHERE email = ? AND event_id = ?',
       [email, event_id]
@@ -72,11 +98,11 @@ router.post('/registrations', async (req, res) => {
       return res.status(400).json({ error: 'You already registered for this event' });
     }
 
-    // 插入注册记录
     await pool.query(`
-      INSERT INTO registrations (event_id, full_name, email, phone, ticket_quantity)
-      VALUES (?, ?, ?, ?, ?)
-    `, [event_id, full_name, email, phone, ticket_quantity]);
+      INSERT INTO registrations (
+        event_id, full_name, email, phone, ticket_quantity, total_amount
+      ) VALUES (?, ?, ?, ?, ?, ?)
+    `, [event_id, full_name, email, phone, ticket_quantity, total_amount]);
 
     res.status(201).json({ message: 'Registration successful! Thank you.' });
   } catch (err) {
@@ -85,7 +111,7 @@ router.post('/registrations', async (req, res) => {
   }
 });
 
-// 3. 可选：获取事件天气（额外功能）
+// 4. 获取事件天气
 router.get('/events/:id/weather', async (req, res) => {
   try {
     const [events] = await pool.query(
@@ -103,12 +129,11 @@ router.get('/events/:id/weather', async (req, res) => {
     const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?` +
       `latitude=${latitude}&longitude=${longitude}&` +
       `daily=weather_code,temperature_2m_max,temperature_2m_min&` +
-      `start_date=${eventDate}&end_date=${eventDate}&timezone=Australia%2FSydney`);
+      `start_date=${eventDate}&end_date=${eventDate}&timezone=Australia%2FSydney`, { timeout: 5000 });
     
+    if (!weatherRes.ok) throw new Error('Weather service error');
     const weather = await weatherRes.json();
-    if (!weather.daily) {
-      return res.status(400).json({ error: 'No weather data available' });
-    }
+    if (!weather.daily) return res.status(400).json({ error: 'No weather data' });
 
     const weatherMap = {
       0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
@@ -122,7 +147,7 @@ router.get('/events/:id/weather', async (req, res) => {
       temp_min: `${weather.daily.temperature_2m_min[0]}°C`
     });
   } catch (err) {
-    console.error('天气API错误：', err);
+    console.error('天气接口错误：', err);
     res.status(500).json({ error: 'Failed to load weather data' });
   }
 });
